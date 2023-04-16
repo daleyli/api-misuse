@@ -26,7 +26,20 @@ that use a given API, and detect if it contains an API misuse.  In
 general, the API misuse detection approaches can be broadly classified
 into two categories. In the first category, the approaches mine the
 API specifications from the API documentation and then check the code
-against them~\cite{ase22,jdoctor-issta18,zhou-icse17,c2s-fse20}.
+against
+them~\cite{ase22,jdoctor-issta18,zhou-icse17,c2s-fse20}. However,
+these approaches are limited in two ways. First, the lack of
+specifications in the API documentation in general has been hindering
+the libraries' users in understanding and using the APIs in the
+correct manner. The reason is that manually defining specifications is
+time-consuming. The libraries' developers must spend additional time
+and effort for documenting API specifications. Second, the existing
+API specification mining approaches work only for specific types of
+specifications, e.g., behavioral exceptions~\cite{ase22}, temporal
+orders~\cite{icse17-nier}, etc. Moreover, they are limited due to
+explicitly pre-defined rules for lexical and semantic matching of
+texts to derive conditions from API
+documentation~\cite{zhou-icse17,jdoctor-issta18}.
 
 %Incorrect usages of an Application Programming Interface (API), or \emph{API misuses}, are violations of (implicit) \emph{usage constraints} of the API.
 %An example of a usage constraint is having to check that \code{hasNext()} returns \code{true} before calling \code{next()} on an \code{Iterator}, in order to avoid a \code{NoSuchElementException} at runtime.
@@ -37,85 +50,81 @@ against them~\cite{ase22,jdoctor-issta18,zhou-icse17,c2s-fse20}.
 % Therefore, in addition to improving documentation, techniques have been developed to detect misuses and warn developers about them.
 %
 
+The second category of API misuse detectors relies on {\em pattern
+  mining}~\cite{LZ05,L07,WZL07,RGJ07,NNP+09,AX09,TX09,TX09b,WZ11,MM13,NPVN16}. First,
+they mine from the large code corpus the {\em API usage patterns},
+which are the API usages occurring frequently. These mined API usage
+patterns are considered as the correct ones. The given code is then
+processed to check for any deviations from these patterns.  If true,
+it is considered as a potential API misuse. Unfortunately, the
+reported precision of such detectors is typically low and a recent
+study~\cite{ANNN+17} showed that their recall is also very low.
+%Tien: key issue
+The still-prevalent problems of API misuse detectors have been
+reported~\cite{LHXRM16,ABFKMS16}. First, the mining-based detectors
+cannot differentiate infrequent from invalid usage. This is an
+inherent issue with mining because these approaches need to set a
+pre-defined threshold for frequent API usage patterns. This also leads
+to the second problem: the detectors often learn a pattern and then
+report instances of alternative usages as violations. Alternative
+usage is a different functionally correct way to use an API to achieve
+the same functionality.
 
 
-The detectors commonly mine \emph{usage patterns}, i.e., equivalent API usages that occur frequently, and then report deviations from these patterns as potential misuses.
-%However, there is a large variance in these detectors' underlying techniques, especially with respect to how they encode API usages and frequency, as well as in how they identify patterns and violations thereof.
-%
-Unfortunately, the reported precision of such detectors is typically low and a recent study~\cite{ANNN+17} showed that their recall is also very low. 
-Thus, we need better detectors to address the still-prevalent problem of API misuse~\cite{LHXRM16,ABFKMS16}.
+%%%
+%%%Previous work identified individual as well as common strengths and weaknesses of existing detectors~\cite{ANNN+17} in an empirical study using the open-source benchmark MUBench~\cite{mubench}.
+%%%In this paper, we investigate whether addressing the reported weaknesses indeed leads to better performance in practice.
+%%%% representation
+%%%Therefore, we design a new misuse detector, MUDetect.
+%%%MUDetect encodes API usages as API-Usage Graphs, a comprehensive usage representation that captures different types of API misuses.
+%%%% domain knowledge
+%%%MUDetect employs a greedy, frequent-subgraph-mining algorithm to mine patterns and a specialized graph-matching strategy to identify pattern violations. % (violating) pattern occurrences.
+%%%Both components consider code semantics to improve the overall detection capabilities.
+%%%% ranking
+%%%On top, MUDetect uses an empirically optimized ranking strategy to effectively rank true positives.
+%%%While previous detectors mostly target a per-project setting~\cite{ANNN+17}, MUDetect also works in a cross-project setting, where it mines thousands of usage examples from third-party projects.
+%%%
+%%%% evaluation
+%%%We assess the precision and recall of MUDetect and show that it outperforms the \checkNum{four} state-of-the-art detectors evaluated in prior work~\cite{ANNN+17}.
+%%%% dataset
+%%%In our evaluation, we extended MUBench by \checkNum{107} real-world misuses identified in a recent study on run-time verification~\cite{LHXRM16}---\checkNum{more than doubling} its size---to ensure that our design decisions generalize.
+%%%%
+%%%%results
+%%%% intra project
+%%%We show that, in a setting with perfect training data, MUDetect achieves a recall of \checkNum{72.5\%}, which is \checkNum{20.3\%} higher than the next best detector and over \checkNum{50\%} higher than the other detectors.
+%%%In the typical per-project setting, MUDetect achieves recall of \checkNum{20.9\%}, which is \checkNum{10.2\%} better than the second-best detector, and precision of \checkNum{21.9\%}, which is \checkNum{13.1\%} better than the second-best detector.
+%%%% cross project
+%%%In a cross-project setting, MUDetect's recall and precision again improve significantly to \checkNum{42.2\%} and \checkNum{33.0\%}, respectively.
+%%%%
+%%%% pull requests
+%%%Throughout the experiments, MUDetect identified 27 previously unknown misuses, which we reported in \checkNum{eight} pull requests (PRs).
+%%%To date, \checkNum{three} of the PRs got accepted, demonstrating that MUDetect identifies actual issues in current software projects.
 
 
+%%%To summarize, this paper makes the following contributions:
+%%%%
+%%%\begin{itemize}[leftmargin=*]
+%%%  \item AUG, a graph-based representation of API usages that captures all usage properties relevant for identifying misuses.
+%%%  \item Code-semantic-aware, greedy frequent-subgraph-mining and graph-matching algorithms to identify patterns within and across projects and (violating) instances in a target codebase.
+%%%  \item MUDetect, a (cross-project) misuse detector.
+%%%  \item An empirical study of ranking strategies to improve precision.
+%%%  \item An empirical evaluation that compares MUDetect to existing detectors, and includes an analysis of the results to identify further opportunities for improvement.
+%%%  \item Fixes for all previously unknown misuses identified by MUDetect, for external validation of the findings' relevance.
+%%%\end{itemize}
+%%%
+%%%We publish our MUBench extension, MUDetect's implementation, and all experiment data, tooling, and results~\cite{artifact-page}.
 
-%\sn{potential place for saving space if we need it to elaborate on other parts. Maybe we shouldn't list the major probs in the intro since we go through them in the very next section. We should have only 1-2 sentences summarizing the type of problems.}
-%Despite the amount of previous work, API misuse remains a problem in practice~\cite{LHXRM16,ABFKMS16}.
-%A recent study~\cite{ANNN+17} empirically evaluated and compared four existing API-misuse detectors using the benchmarking infrastructure \MUBench~\cite{mubench}.
-%The study identified several major problems, that affect precision and recall:
-%
-%\begin{itemize}[leftmargin=*]
-%  \item Detectors fail to distinguish correct usages from misuses, due to not capturing sufficient code details. % in their representations.
-%  \item Detectors ignore alternative usage patterns and semantically correct deviations, e.g., using a subtype versus a supertype, naively assuming that all deviations from usage patterns are misuses.
-%  \item Detectors often fail to relate misuses with patterns, because the difference between the two exceeds an assumed threshold.
-%  \item Detectors often fail to relate misuses with patterns, because they assume a maximum distance between a misuse and a pattern, which is frequently exceeded.
-%  \item Detectors have poor ranking strategies that rank many false-positive findings higher than true-positive ones.
-%\end{itemize}
-%
-%Furthermore, the study observed that evaluations mostly apply detectors in a per-project setting, where they mine usage patterns solely from the project in which they detect misuses.
-%A presented hypothesis is that individual projects contain too few usages examples to mine good patterns, which limits the detectors' recall.
-%
-% \mm{ The last item doesn't really sounds like a problem. It is rather an observation and we speculate that this might cause a problem with the models. But, we didn't validate this hypothesis in the study, did we? We are actually validating this hypothesis in this paper by applying MuDetect in a cross-project setting. Or is there a feature in the design of the other detectors that prevents them by-design from being applicable in a cross-project setting?}
-% \sa{@Mira: I pulled the intra-/cross-project hypothesis out of the problems list and paraphrased it. Do you like this better now?}~\sa{Conceptually, we can apply all detectors cross-project, by providing them the examples from all projects. This would be the same as if the target project contained all the examples (they would also report violations in all projects). MUDetect has the special notion of cross-project pattern support and reports violations only for the target project.}
-%
-%All these problems need to be properly addressed for API-misuse detectors to be practically useful.
-%\hn{Listing many problems and observations from the study might make reviewers feel the paper is incremental. The next paragraph actually can stand on its own without listing the problems and observations: it states the key components of the approach including representation, mining and detection algorithms, and ranking.}
-
-Previous work identified individual as well as common strengths and weaknesses of existing detectors~\cite{ANNN+17} in an empirical study using the open-source benchmark MUBench~\cite{mubench}.
-In this paper, we investigate whether addressing the reported weaknesses indeed leads to better performance in practice. 
-% representation
-Therefore, we design a new misuse detector, MUDetect. 
-MUDetect encodes API usages as API-Usage Graphs, a comprehensive usage representation that captures different types of API misuses.
-% domain knowledge
-MUDetect employs a greedy, frequent-subgraph-mining algorithm to mine patterns and a specialized graph-matching strategy to identify pattern violations. % (violating) pattern occurrences.
-Both components consider code semantics to improve the overall detection capabilities.
-% ranking
-On top, MUDetect uses an empirically optimized ranking strategy to effectively rank true positives.
-While previous detectors mostly target a per-project setting~\cite{ANNN+17}, MUDetect also works in a cross-project setting, where it mines thousands of usage examples from third-party projects.
-
-% evaluation
-We assess the precision and recall of MUDetect and show that it outperforms the \checkNum{four} state-of-the-art detectors evaluated in prior work~\cite{ANNN+17}.
-% dataset
-In our evaluation, we extended MUBench by \checkNum{107} real-world misuses identified in a recent study on run-time verification~\cite{LHXRM16}---\checkNum{more than doubling} its size---to ensure that our design decisions generalize.
-%
-%results
-% intra project
-We show that, in a setting with perfect training data, MUDetect achieves a recall of \checkNum{72.5\%}, which is \checkNum{20.3\%} higher than the next best detector and over \checkNum{50\%} higher than the other detectors.
-In the typical per-project setting, MUDetect achieves recall of \checkNum{20.9\%}, which is \checkNum{10.2\%} better than the second-best detector, and precision of \checkNum{21.9\%}, which is \checkNum{13.1\%} better than the second-best detector.
-% cross project
-In a cross-project setting, MUDetect's recall and precision again improve significantly to \checkNum{42.2\%} and \checkNum{33.0\%}, respectively.
-%
-% pull requests
-Throughout the experiments, MUDetect identified 27 previously unknown misuses, which we reported in \checkNum{eight} pull requests (PRs).
-To date, \checkNum{three} of the PRs got accepted, demonstrating that MUDetect identifies actual issues in current software projects.
+In this paper, we address those above problems with the mining-based
+API misuse detection approaches. We introduce {\tool}, a
+learning-based API misuse detection approach, that leverages two key
+insights to overcome those issues. First, we use a graph
+representation, called Augmented Usage Graph
+(AUG)~\cite{mutetect-msr19}, to represent the program dependencies and
+relations among the API elements as well as other program elements in
+an API usage. Second, due to the lack of training data for the code
+with API misuses, we apply several techniques for data augmentation.
 
 
-% conclusion
-% These results show that our systematic design approach, based on the strengths and deficiencies of existing detectors, successfully led us to a significantly better detector, while balancing recall and precision.
-% \hn{kind of repeated. candidate for shortening}
-% The most important decision was to separate pattern mining and violation detection, which allowed us to train MUDetect on cross-project usage examples.
-%\hn{Should this be part of contribution?}~\sa{I don't think its a contribution in its own right, rather a design decision for the algorithms. I'll make sure to note this later.}
-% ~\sn{remove next sentence?}
-% Future work should focus more on providing detectors with high-quality training examples.
-
-To summarize, this paper makes the following contributions:
-%
-\begin{itemize}[leftmargin=*]
-  \item AUG, a graph-based representation of API usages that captures all usage properties relevant for identifying misuses. 
-  \item Code-semantic-aware, greedy frequent-subgraph-mining and graph-matching algorithms to identify patterns within and across projects and (violating) instances in a target codebase.
-  \item MUDetect, a (cross-project) misuse detector.
-  \item An empirical study of ranking strategies to improve precision.
-  \item An empirical evaluation that compares MUDetect to existing detectors, and includes an analysis of the results to identify further opportunities for improvement.
-  \item Fixes for all previously unknown misuses identified by MUDetect, for external validation of the findings' relevance.
-\end{itemize}
-
-We publish our MUBench extension, MUDetect's implementation, and all experiment data, tooling, and results~\cite{artifact-page}.
-
+%We extract the AUGs from the complete, compilable source code using
+%the APIs from a large code corpus. We then enhance the AUGs with all
+%the FQNs because the training code is compilable.
