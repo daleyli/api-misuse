@@ -121,8 +121,10 @@ insights to overcome those issues. First, we use a graph
 representation, called Augmented Usage Graph
 (AUG)~\cite{mutetect-msr19}, to represent the program dependencies and
 relations among the API elements as well as other program elements in
-an API usage. Second, due to the lack of training data for the code
-with API misuses, we apply several techniques for data augmentation.
+an API usage. We then use the Graph Convolutional Network (GCN) to
+model the API usage by encoding the corresponding AUG. Second, due to
+the lack of training data for the code with API misuses, we apply
+several techniques for data augmentation.
 
 
 %We extract the AUGs from the complete, compilable source code using
