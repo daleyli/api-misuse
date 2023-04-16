@@ -116,22 +116,23 @@ the same functionality.
 
 In this paper, we address those above problems with the mining-based
 API misuse detection approaches. We introduce {\tool}, a
-learning-based API misuse detection approach, that leverages two key
-insights to overcome those issues.
-
-%Principle of Regularity
-
+learning-based API misuse detection approach, that leverages key
+insights to overcome those issues of the mining-based approaches.
+First, we leverage the principle of regularity on API
+usages~\cite{NNP+09}. The API elements do not appear randomly in
+source code. The libraries' designers have the intent for developers
+to use the API elements in specific combinations for some
+functionality. Therefore, in large code corpus, the correct API usages
+would exhibit a certain level of regularity.
 %Representation and Modeling
-
-%Data Augmentation
-
-First, we use a graph representation, called Augmented Usage Graph
+Second, we use a graph representation, called Augmented Usage Graph
 (AUG)~\cite{mudetect-msr19}, to represent the program dependencies and
 relations among the API elements as well as other program elements in
 an API usage. We then use the Graph Convolutional Network (GCN) to
-model the API usage by encoding the corresponding AUG. Second, due to
+model the API usage by encoding the corresponding AUG. Finally, due to
 the lack of training data for the code with API misuses, we apply
-several techniques for data augmentation.
+several techniques for data augmentation to achieve better
+effectiveness level in API misuse detection.
 
 
 %We extract the AUGs from the complete, compilable source code using
