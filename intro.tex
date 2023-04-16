@@ -1,16 +1,44 @@
 \section{Introduction}
 \label{sec:intro}
 
-Incorrect usages of an Application Programming Interface (API), or \emph{API misuses}, are violations of (implicit) \emph{usage constraints} of the API.
-An example of a usage constraint is having to check that \code{hasNext()} returns \code{true} before calling \code{next()} on an \code{Iterator}, in order to avoid a \code{NoSuchElementException} at runtime.
-API misuse is a prevalent cause of software bugs, crashes, and vulnerabilities~\cite{MM13,SHA15,FHMB+12,EBFK13,NKMB16,GIJA+12,ANNN+16}.
+Software libraries provide an excellent mechanism for practical
+software reuse. Each library provides its functionality through the
+Application Programming Interfaces (APIs). The library's designers
+have the intent for developers to use the APIs in specific
+combinations and orders to achieve its functionality. Such correct API
+usages are often described in {\em API specifications}. A common
+phenomenon in programming with libraries is API misuses. API misuses
+are the incorrect usages that violate the usage constraints of the
+APIs involving in an API usage to achieve certain task.  For example,
+to correctly use an \code{Iterator}, one must check that
+\code{Iterator.hasNext()} returns \code{true} before calling
+\code{Iterator.next()} on the \code{Iterator} object. Otherwise,
+an \code{NoSuchElementException} will be thrown at run-time.
+
+API misuses have been shown to cause several issues ranging from
+run-time errors, program crashes, null-pointer exceptions, to security
+vulnerabilities~\cite{mudetect-msr19,MM13,SHA15,FHMB+12,EBFK13,NKMB16,GIJA+12,ANNN+16}. To
+mitigate API misuse, researchers have proposed several
+\emph{API-misuse
+detectors}~\cite{LZ05,L07,WZL07,RGJ07,NNP+09,AX09,TX09,TX09b,WZ11,MM13,NPVN16}.
+These detectors analyze a given \emph{API usage}, i.e., a code snippet
+that use a given API, and detect if it contains an API misuse.  In
+general, the API misuse detection approaches can be broadly classified
+into two categories. In the first category, the approaches mine the
+API specifications from the API documentation and then check the code
+against them~\cite{ase22,jdoctor-issta18,zhou-icse17,c2s-fse20}.
+
+%Incorrect usages of an Application Programming Interface (API), or \emph{API misuses}, are violations of (implicit) \emph{usage constraints} of the API.
+%An example of a usage constraint is having to check that \code{hasNext()} returns \code{true} before calling \code{next()} on an \code{Iterator}, in order to avoid a \code{NoSuchElementException} at runtime.
+%API misuse is a prevalent cause of software bugs, crashes, and vulnerabilities~\cite{MM13,SHA15,FHMB+12,EBFK13,NKMB16,GIJA+12,ANNN+16}.
 
 % While good API documentation might mitigate the problem, a recent study shows that Android developers, for example, prefer informal references, such as StackOverflow, over official API documentation, even though the former promote many insecure API usages~\cite{ABFKMS16}.
 % Previous work also indicates that developers struggle with well-documented APIs, such as Java's \code{Iterator}~\cite{ANNN+17}.
 % Therefore, in addition to improving documentation, techniques have been developed to detect misuses and warn developers about them.
 %
-To mitigate API misuse, researchers have proposed several \emph{API-misuse detectors}~\cite{LZ05,L07,WZL07,RGJ07,NNP+09,AX09,TX09,TX09b,WZ11,MM13,NPVN16}.
-These detectors analyze \emph{API usages}, i.e., code snippets that use a given API.
+
+
+
 The detectors commonly mine \emph{usage patterns}, i.e., equivalent API usages that occur frequently, and then report deviations from these patterns as potential misuses.
 %However, there is a large variance in these detectors' underlying techniques, especially with respect to how they encode API usages and frequency, as well as in how they identify patterns and violations thereof.
 %
