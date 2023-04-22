@@ -24,32 +24,33 @@
 	}
 \begin{lstlisting}[]
 class HttpMethodDirector {
-  AuthState authstate = method.getHostAuthState();
-  if (authstate.isPreemptive()) {
-    authstate.invalidate();
-(*@{\color{cyan}{\quad + authstate.setAuthRequested(true);}@*)
+  AuthState authstate = method.(*@{\color{red}{getHostAuthState}@*)();
+  if (authstate.(*@{\color{red}{isPreemptive}@*)()) {
+    authstate.(*@{\color{red}{invalidate}@*)();
+(*@{\color{cyan}{\quad + authstate.}@*)(*@{\color{red}{setAuthRequested(true);}@*)
   }
   Map challenges = AuthChallengeParser.parseChallenges(
   method.getResponseHeaders(WWW_AUTH_CHALLENGE));
   ...
 \end{lstlisting}
         \vspace{-12pt}
-        \caption{An API Misuse in Apache \code{HttpClient} project}
+        \caption{An API misuse in Apache \code{HttpClient} project}
         \vspace{-6pt}
         \label{fig:example1}
 \end{figure}
 
 Let us use real-world examples to illustrate the problem and motivate
 our solution. Fig.~\ref{fig:example1} displays an API misuse in
-MuBench~\cite{mudetect-msr19}, an established API misuse dataset. The
-code shows the usage of the API elements in \code{httpclient} of
-Apache.  The intended usage of the API elements is that when
-\code{Auth\-State.\-is\-Pre\-emptive\-()}, both
+MuBench~\cite{mudetect-msr19}, an API misuse dataset. The code shows
+the usage of the API elements in \code{httpclient} of Apache.  The
+intended usage of the API elements is that when
+\code{Auth\-State.\-is\-Pre\-emptive\-()} returns true (i.e., the
+status of the current authentication is preemptive), both
 \code{Auth\-State.\-invalidate()} and
 \code{Auth\-State.\-set\-Auth\-Requested(true)} must be called. The
-purpose is to invalidate the current operation and to set the need for
-an authentication for later operation. However, the latter call was
-missing.
+purpose is to invalidate the current request and to set the need for
+an authentication for a later operation. However, the latter call was
+missing. Thus, line 5 was added to fix the~misuse.
 
 \begin{figure}[t]
 	\centering
@@ -77,10 +78,10 @@ private void authenticateHost(final HttpMethod method) {
   ...
   if (LOG.isWarnEnabled()) {
     LOG.warn(``Required credentials not available'');
-    if (method.getHostAuthState().isPreemptive()) {
+    if (method.(*@{\color{red}{getHostAuthState().isPreemptive()}@*)) {
       LOG.warn(``Preemptive authentication requested but no default credentials available'');
-(*@{\color{cyan}{\quad \quad method.getHostAuthState().invalidate();}@*)
-(*@{\color{cyan}{\quad \quad method.getHostAuthState().setAuthRequested(true);}@*)
+      method.getHostAuthState().(*@{\color{red}{invalidate();}@*)
+      method.getHostAuthState().(*@{\color{red}{setAuthRequested(true);}@*)
   }
 }
 \end{lstlisting}
@@ -89,3 +90,48 @@ private void authenticateHost(final HttpMethod method) {
         \vspace{-6pt}
         \label{fig:example2}
 \end{figure}
+
+This usage scenario is one of the intended usages of the
+\code{httpClient} library. As a result, the API usage repeats in other
+projects. Fig.~\ref{fig:example2} shows the same usage in the Github
+project \code{jerenkrantz}. Despite the differences in the details of
+surrounding code, the sequence/orders of the relevant API elements
+\code{getHostAuthState}, \code{isPreemptive}, \code{invalidate}, and
+\code{setAuthRequested} are the same.
+
+%\vspace{2pt}
+%\noindent {\bf Observation 1} [{\em Regularity of API Usages}]. The
+%designers of software libraries have the intents for developers to use
+%the API elements together (including API classes, method calls, field
+%accesses) in certain combinations/orders to achieve a programming
+%task.
+
+\begin{Observation}[Regularity of API usages]
+The designers of software libraries have the intention for the API
+elements to be used together (including API classes, method calls,
+field accesses) in certain combinations/orders to achieve a
+programming task.
+\end{Observation}
+
+This observation motivates a learning-based approach that could
+leverage the regularity of API usages without the need of a threshold
+as in the mining-based approaches. A machine learning (ML) model could
+learn the API usages from existing code corpus to decide whether the
+current API usage conforms or violates API usage specifications.
+
+Compared the usages in Fig.~\ref{fig:example1} and
+Fig.~\ref{fig:example2}, we can see that the surrounding code contexts
+of the above relevant API elements can be different and are less
+important in deciding whether the current API usage is a violation or
+not. For example, the lines 7--8 in Fig.~\ref{fig:example1} for
+handling response headers and lines 3,4, and 6 in
+Fig.~\ref{fig:example2} to deal with logging are less crucial than the
+lines with \code{getHostAuthState}, \code{isPreemptive},
+\code{invalidate}, and \code{setAuthRequested}.
+
+\begin{Observation}[API elements in API usages]
+To decide an API misuse, one needs to examine the API elements
+including API classes, method calls, field accesses together with the
+data and control dependencies among them and other relevant program
+elements.
+\end{Observation}
