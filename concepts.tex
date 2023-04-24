@@ -62,30 +62,60 @@ The usage relations are defined as follows.
 Let us use the term {\em action nodes} to refer to method calls, field
 accesses, or operators, and the term {\em data nodes} to represent
 objects, values, and literals that appear in API usages. A {\em
-  receiver} relation exists between a variable and a method call. In
-Fig.~\ref{fig:example2}, at line 3, there exists a receiver relation
-between the variable \code{myButton} and the method
-\code{addClickHandler}. A {\em parameter} relation connects an
-argument to be used as a parameter of an action. A {\em definition}
-relation exists between a constructor or method call that creates or
-returns a value or object to the respective variable. An {\em order}
-relation connects two actions on operating on the same receiver or
-parameter. A {\em condition} relation connects an action whose result
-controls branching to an action being controlled. A {\em synchronize}
-relation connects a variable that the program obtains a lock on to an
-action executed under that lock. A {\em throw} relation connects an
-action that may throw an exception to a data node representing that
-exception object. A {\em handle} relation connects from a \code{catch}
-action to an action in a respective exception handling block.
+  receiver} relation exists between a variable and a method call. A
+{\em parameter} relation connects an argument to be used as a
+parameter of an action. A {\em definition} relation exists between a
+constructor or method call that creates or returns a value or object
+to the respective variable. An {\em order} relation connects two
+actions on operating on the same receiver or parameter. A {\em
+  condition} relation connects an action whose result controls
+branching to an action being controlled. A {\em synchronize} relation
+connects a variable that the program obtains a lock on to an action
+executed under that lock. A {\em throw} relation connects an action
+that may throw an exception to a data node representing that exception
+object. A {\em handle} relation connects from a \code{catch} action to
+an action in a respective exception handling block.
 
-We expect to leverage those API usage relations among the API elements
-and relevant program entities to learn the FQNs.
+We expect to leverage API usage relations among API elements
+and relevant program entities for misuse detection.
 
+\begin{figure}[t] %[!htp]
+	\centering
+	\includegraphics[width=1.8in]{aug}
+        \vspace{-3pt}
+	\caption{API-Usage Graph for Fig.~\ref{fig:example1}}
+	\label{fig:aug}
+\end{figure}
 
+Fig.~\ref{fig:aug} shows the AUG of the code in
+Fig.~\ref{fig:example1}.  The action nodes are displayed in the
+rectangles and the data nodes in the oval shapes. The action nodes
+represent method calls \code{Http\-Method\-.get\-Host\-Auth\-State},
+\code{Auth\-State\-.isPre\-emptive}, \code{Auth\-State.\-invalidate},
+\code{Auth\-State\-.set\-Auth\-Requested}. If the types are available,
+they will be resolved. However, in the figure, only the simple name is
+shown for clarity. The data nodes represent the variable \code{method}
+with the type \code{Http\-Method}, and the variable \code{authstate}
+with the type \code{Auth\-State}. The condition node \code{if}
+represents the \code{if} structure at line 3 of
+Fig.~\ref{fig:example1}.
 
-%Fig.~\ref{fig:aug} shows an example of an API usage and its AUG.
-%The action nodes are displayed in the rectangles and the data nodes in
-%the oval shapes. The action nodes represent constructor calls
+There is a \code{recv} edge from \code{HttpMethod} to
+\code{get\-Host\-Auth\-State} (line 2) and another \code{recv} edge
+from \code{Auth\-State} to \code{isPre\-emptive} (line 3). There is a
+\code{def} edge from \code{get\-Host\-Auth\-State} to
+\code{Auth\-State} because the assignment statement at line 2 to
+define the variable \code{auth\-state}. An \code{order} edge exists
+between \code{get\-Host\-Auth\-State} and \code{is\-Pre\-emptive}
+because the former needs to be executed before the latter. Similar
+treatment is applied for \code{invalidate} and
+\code{set\-Auth\-Requested}. Because the \code{if} node represents the
+branching point in the condition structure, \code{isPre\-emptive} is
+executed before \code{if}. Finally, there are two \code{cond} edges
+from \code{if} to either \code{invalidate} and
+\code{set\-Auth\-Requested} due to the control flows from the
+branching point to either branch.
+
 %(\code{init}), method calls, field accesses, and operators. If the
 %types are available, they will be resolved. However, in the figure,
 %only the simple name is shown for clarity. The relational operators
