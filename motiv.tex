@@ -16,7 +16,7 @@
 		framexleftmargin=1.3em,
                 numbersep= 3pt,
 %                numbersep=-12pt,
-                framexrightmargin=-3mm,
+                framexrightmargin=-1mm,
 		language=Java,
                 basicstyle=\scriptsize\ttfamily,
                 numberstyle=\scriptsize\ttfamily,
@@ -25,7 +25,7 @@
 		escapeinside= {(*@}{@*)}
 	}
 \begin{lstlisting}[]
-class HttpMethodDirector {
+boolean processWWWAuthChallenge(final HttpMethod method){
   AuthState authstate = method.(*@{\color{red}{getHostAuthState}@*)();
   if (authstate.(*@{\color{red}{isPreemptive}@*)()) {
     authstate.(*@{\color{red}{invalidate}@*)();
@@ -36,10 +36,13 @@ class HttpMethodDirector {
   ...
 \end{lstlisting}
         \vspace{-12pt}
-        \caption{An API misuse in Apache \code{HttpClient} project}
+        \caption{An API misuse in class \code{HttpMethodDirector} of
+          Apache \code{HttpClient} project}
         \vspace{-6pt}
         \label{fig:example1}
 \end{figure}
+
+% class HttpMethodDirector {
 
 Let us use real-world examples to illustrate the problem and motivate
 our solution. Fig.~\ref{fig:example1} displays an API misuse in
