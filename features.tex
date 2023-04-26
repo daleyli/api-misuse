@@ -1,0 +1,10 @@
+\subsection{Code Feature Representation Learning}
+\label{sec:features}
+
+An API element at a node in the AUG built from a method is represented
+via a sequence of the sub-tokens. The sub-token granularity for source
+code has been shown to have higher regularity than the token
+level~\cite{icse20-methodname}. Each name of an API element at a node
+is tokenized using CamelCase or Hungarian convention. Then, only
+variables, methods, fields, and class' names are kept. The sub-tokens
+with one character are removed to avoid noises.
