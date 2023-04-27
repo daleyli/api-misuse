@@ -29,7 +29,7 @@ boolean processWWWAuthChallenge(final HttpMethod method){
   AuthState authstate = method.(*@{\color{red}{getHostAuthState}@*)();
   if (authstate.(*@{\color{red}{isPreemptive}@*)()) {
     authstate.(*@{\color{red}{invalidate}@*)();
-(*@{\color{cyan}{\quad + authstate.}@*)(*@{\color{red}{setAuthRequested(true);}@*)
+(*@{\color{cyan}{\quad +authstate.}@*)(*@{\color{red}{setAuthRequested(true);}@*)
   }
   Map challenges = AuthChallengeParser.parseChallenges(
   method.getResponseHeaders(WWW_AUTH_CHALLENGE));
@@ -46,15 +46,15 @@ boolean processWWWAuthChallenge(final HttpMethod method){
 
 Let us use real-world examples to illustrate the problem and motivate
 our solution. Fig.~\ref{fig:example1} displays an API misuse in
-MuBench~\cite{mudetect-msr19}, an API misuse dataset. The code shows
-the usage of the API elements in \code{httpclient} of Apache.  The
-intended usage of the API elements is that when
+MuBench~\cite{mudetect-msr19}, a public API misuse dataset. The code
+shows the usage of the API elements in \code{httpclient} of Apache.
+The intended usage of the API elements is that when
 \code{Auth\-State.\-is\-Pre\-emptive\-()} returns true (i.e., the
 status of the current authentication is preemptive), both
 \code{Auth\-State.\-invalidate()} and
 \code{Auth\-State.\-set\-Auth\-Requested(true)} must be called. The
 purpose is to invalidate the current request and to set the need for
-an authentication for a later operation. However, the latter call was
+an authentication on a later operation. However, the latter call was
 missing. Thus, line 5 was added to fix the~misuse.
 
 \begin{figure}[t]
@@ -84,9 +84,9 @@ private void authenticateHost(final HttpMethod method) {
   if (LOG.isWarnEnabled()) {
     LOG.warn(``Required credentials not available'');
     if (method.(*@{\color{red}{getHostAuthState().isPreemptive()}@*)) {
-      LOG.warn(``Preemptive authentication requested but no default credentials available'');
-      method.getHostAuthState().(*@{\color{red}{invalidate();}@*)
-      method.getHostAuthState().(*@{\color{red}{setAuthRequested(true);}@*)
+        LOG.warn(``Preemptive authentication requested but no default credentials available'');
+        method.getHostAuthState().(*@{\color{red}{invalidate();}@*)
+        method.getHostAuthState().(*@{\color{red}{setAuthRequested(true);}@*)
   }
 }
 \end{lstlisting}
@@ -113,23 +113,24 @@ surrounding code, the sequence/orders of the relevant API elements
 
 \begin{Observation}[Regularity of API usages]
 The designers of software libraries have the intention for the API
-elements to be used together (including API classes, method calls,
-field accesses) in certain combinations/orders to achieve a
+elements (including API classes, method calls, field accesses) to be
+used together in certain combinations and orders to achieve a
 programming task.
 \end{Observation}
 
 This observation motivates a learning-based approach that could
-leverage the regularity of API usages without the need of a threshold
-as in the mining-based approaches. A machine learning (ML) model could
-learn the API usages from existing code corpus to decide whether the
-current API usage conforms or violates API usage specifications.
+leverage the regularity of API usages, thus, avoiding the need of
+a threshold as in the mining-based approaches. A machine learning (ML)
+model could learn the API usages from existing code corpus to decide
+whether the current API usage conforms or violates API usage
+specifications.
 
 Compared the usages in Fig.~\ref{fig:example1} and
 Fig.~\ref{fig:example2}, we can see that the surrounding code contexts
 of the above relevant API elements can be different and are less
 important in deciding whether the current API usage is a violation or
 not. For example, the lines 7--8 in Fig.~\ref{fig:example1} for
-handling response headers and lines 3,4, and 6 in
+handling response headers and lines 3, 4, and 6 in
 Fig.~\ref{fig:example2} to deal with logging are less crucial than the
 lines with \code{getHostAuthState}, \code{isPreemptive},
 \code{invalidate}, and \code{setAuthRequested}.
