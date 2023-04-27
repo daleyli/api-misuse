@@ -163,17 +163,17 @@ approaches suffer low accuracy because they cannot differentiate
 infrequent from invalid usage. This is an inherent issue with mining
 because these approaches need to set a pre-defined threshold for
 frequent API usage patterns. Another issue is that they mine a pattern
-and then report instances of alternative usages as violations.  In
-this work, we introduce a learning-based approach for API misuse
-detection that avoids the need of pre-defined thresholds. To overcome
-the lack of training data, we leverage two key data augmentation
-techniques to apply for AUG, a graph-based representation of API
-usages. We also leverage Labeled, Graph-based Convolutional Network to
-learn the embeddings for API usages, which capture the key features in
-API usages and be used for API misuse detection. Our empirical
-evaluation on real-world, API misuse benchmark shows that our model
-can relatively improve over the state-of-the-art API misuse detection
-from 30--35\%.
+and then report instances of alternative usages as violations. This
+paper introduces a learning-based approach for API misuse detection
+that avoids the need of pre-defined thresholds. To overcome the lack
+of training data, we adapt two key data augmentation techniques to
+apply for a graph-based representation of API usages. We also
+leverage Labeled, Graph-based Convolutional Network to learn the
+embeddings for API usages, which capture the key features in API
+usages and be used for API misuse detection.~Our empirical evaluation
+on real-world, API misuse benchmark shows that our model relatively
+improves over the state-of-the-art API misuse detection from 30--35\%
+and 25-30\% at the method and API~levels, respectively.
 \end{abstract}
 
 %\begin{IEEEkeywords}
