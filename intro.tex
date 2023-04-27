@@ -1,45 +1,45 @@
 \section{Introduction}
 \label{sec:intro}
 
-Software libraries provide an excellent mechanism for practical
-software reuse. Each library provides its functionality through the
-Application Programming Interfaces (APIs). The library's designers
-have the intent for developers to use the APIs in specific
-combinations and orders to achieve its functionality. Such correct API
-usages are often described in {\em API specifications}. A common
-phenomenon in programming with libraries is API misuses. API misuses
-are the incorrect usages that violate the usage constraints of the
-APIs involving in an API usage to achieve certain task.  For example,
-to correctly use an \code{Iterator}, one must check that
-\code{Iterator.hasNext()} returns \code{true} before calling
-\code{Iterator.next()} on the \code{Iterator} object. Otherwise,
-an \code{NoSuchElementException} will be thrown at run-time.
+Software libraries provide an excellent mechanism for software
+reuse. A library provides its functionality~via~Application
+Programming Interfaces (APIs). The library's designers have the intent
+for developers to use the APIs in specific combinations and orders to
+achieve its functionality. Such correct API usages are often described
+in {\em API specifications}. A common phenomenon in programming with
+libraries is API misuses. API misuses are the incorrect usages that
+violate the usage constraints of the APIs involving in an API usage to
+achieve certain task.  For example, to correctly use an
+\code{Iterator}, one must check that \code{Iterator.hasNext()} returns
+\code{true} before calling \code{Iterator.next()} on the
+\code{Iterator} object. Otherwise, an \code{NoSuchElementException}
+will be thrown at run-time.
 
 API misuses have been shown to cause several issues ranging from
 run-time errors, program crashes, null-pointer exceptions, to security
 vulnerabilities~\cite{mudetect-msr19,MM13,SHA15,FHMB+12,EBFK13,NKMB16,GIJA+12,ANNN+16}. To
-mitigate API misuse, researchers have proposed several
+mitigate API misuses, researchers have proposed several
 \emph{API-misuse
 detectors}~\cite{LZ05,L07,WZL07,RGJ07,NNP+09,AX09,TX09,TX09b,WZ11,MM13,NPVN16}.
 These detectors analyze a given \emph{API usage}, i.e., a code snippet
-that use a given API, and detect if it contains an API misuse.  In
-general, the API misuse detection approaches can be broadly classified
-into two categories. In the first category, the approaches mine the
-API specifications from the API documentation and then check the code
+that use APIs, and detect if it contains an API misuse. In general,
+the API misuse detection approaches can be broadly classified into two
+categories. In the first category, the approaches mine the API
+specifications from the API documentation and then check the code
 against
 them~\cite{ase22,jdoctor-issta18,zhou-icse17,c2s-fse20}. However,
 these approaches are limited in two ways. First, the lack of
-specifications in the API documentation in general has been hindering
-the libraries' users in understanding and using the APIs in the
-correct manner. The reason is that manually defining specifications is
-time-consuming. The libraries' developers must spend additional time
-and effort for documenting API specifications. Second, the existing
-API specification mining approaches work only for specific types of
-specifications, e.g., behavioral exceptions~\cite{ase22}, temporal
-orders~\cite{icse17-nier}, etc. Moreover, they are limited due to
-explicitly pre-defined rules for lexical and semantic matching of
-texts to derive conditions from API
-documentation~\cite{zhou-icse17,jdoctor-issta18}.
+specifications in the API documentation has been hindering the
+libraries' users in understanding and using the APIs in the correct
+manner. A reason for such missing is that manually defining
+specifications is time-consuming. The libraries' developers must spend
+additional time and effort for documenting API specifications. Second,
+the existing API specification mining approaches work only for
+specific types of specifications, e.g., behavioral
+exceptions~\cite{ase22}, temporal orders~\cite{icse17-nier},
+etc. Moreover, they are limited due to explicitly pre-defined rules
+for lexical and semantic matching of texts to derive specifications
+from API documentation~\cite{zhou-icse17,jdoctor-issta18}.
 
 %Incorrect usages of an Application Programming Interface (API), or \emph{API misuses}, are violations of (implicit) \emph{usage constraints} of the API.
 %An example of a usage constraint is having to check that \code{hasNext()} returns \code{true} before calling \code{next()} on an \code{Iterator}, in order to avoid a \code{NoSuchElementException} at runtime.
@@ -53,7 +53,7 @@ documentation~\cite{zhou-icse17,jdoctor-issta18}.
 The second category of API misuse detectors relies on {\em pattern
   mining}~\cite{LZ05,L07,WZL07,RGJ07,NNP+09,AX09,TX09,TX09b,WZ11,MM13,NPVN16}. First,
 they mine from the large code corpus the {\em API usage patterns},
-which are the API usages occurring frequently. These mined API usage
+which are the frequently-occurring API usages. These mined API usage
 patterns are considered as the correct ones. The given code is then
 processed to check for any deviations from these patterns.  If true,
 it is considered as a potential API misuse. Unfortunately, the
@@ -66,8 +66,8 @@ cannot differentiate infrequent from invalid usage. This is an
 inherent issue with mining because these approaches need to set a
 pre-defined threshold for frequent API usage patterns. This also leads
 to the second problem: the detectors often learn a pattern and then
-report instances of alternative usages as violations. Alternative
-usage is a different functionally correct way to use an API to achieve
+report instances of alternative usages as violations. An alternative
+usage is a different functionally correct way to use the APIs to achieve
 the same functionality.
 
 
@@ -114,7 +114,7 @@ the same functionality.
 %%%
 %%%We publish our MUBench extension, MUDetect's implementation, and all experiment data, tooling, and results~\cite{artifact-page}.
 
-In this paper, we address those above problems with the mining-based
+In this paper, we address those above problems from the mining-based
 API misuse detection approaches. We introduce {\tool}, a
 learning-based API misuse detection approach, that leverages key
 insights to overcome those issues of the mining-based approaches.
@@ -123,18 +123,56 @@ usages~\cite{NNP+09}. The API elements do not appear randomly in
 source code. The libraries' designers have the intent for developers
 to use the API elements in specific combinations for some
 functionality. Therefore, in large code corpus, the correct API usages
-would exhibit a certain level of regularity.
-%Representation and Modeling
+would exhibit a certain level of regularity that enables a deep
+learning (DL)/machine learning (ML) model to learn to detect API
+misuses.
+%
 Second, we use a graph representation, called Augmented Usage Graph
 (AUG)~\cite{mudetect-msr19}, to represent the program dependencies and
 relations among the API elements as well as other program elements in
-an API usage. We then use the Graph Convolutional Network (GCN) to
-model the API usage by encoding the corresponding AUG. Finally, due to
-the lack of training data for the code with API misuses, we apply
-several techniques for data augmentation to achieve better
-effectiveness level in API misuse detection.
+an API usage. We then use the Labeled, Graph-based Convolutional
+Network (Label-GCN)~\cite{label-gcn} to model the API usage by
+encoding the corresponding AUG. Finally, due to the lack of training
+data for the code with API misuses, we apply several techniques for
+data augmentation to achieve a better effectiveness level in API
+misuse detection.
 
+{\bf FIXME} We conducted several experiments to evaluate {\tool} in
+real-world, benchmark of API misuses. We have collected a large
+dataset of 5,726 projects from Github, with 19,379 code snippets that
+contain \code{try-catch} blocks.
+%
+Our empirical evaluation shows that {\tool} relatively
+improves 12.3\% in F-score over the state-of-the-art approach,
+XRank~\cite{xrank-fse20} in \code{try-catch} block necessity checking.
+%{\bf -7.1\%, 28.3\%, and 12.3\%} over the state-of-the-art model,
+%XRank~\cite{xrank-fse20}, in \code{try-catch} block necessity checking
+%in Recall, Precision, and F-score, respectively.
+{\tool} also achieves a high accuracy of 74\% in recommending the
+statements to be placed in a \code{try-catch} block. It can cover all
+the needed exception types in 63\% of the cases and predict correctly
+all exception types in 33\% of the cases. Our extrinsic evaluation
+also shows that {\tool} improves 9.8\% in F-score over
+FuzzyCatch~\cite{xrank-fse20} in detecting exception-related~bugs.
 
-%We extract the AUGs from the complete, compilable source code using
-%the APIs from a large code corpus. We then enhance the AUGs with all
-%the FQNs because the training code is compilable.
+The key contributions of this paper include:
+
+\vspace{2pt}
+\noindent {\bf 1. [Neural Network-based API Misuse
+    Detection]}. {\tool} is the first neural-network approach to
+detect API misuses that overcome the key limitations in the
+state-of-the-art mining-based techniques.
+
+\vspace{2pt}
+\noindent {\bf 2. [Data Augmentation Technique for API Misuses]} We
+design a novel data augmentation technique for API misuses that
+artificially increases the training set by creating modified copies of
+a dataset using existing data. Our technique is based on the mutation
+on a graph-based representation of API usages and the noisy-student
+self-training framework.
+
+\noindent {\bf 3. [Empirical Evaluation]}. Our extensive evaluation
+shows {\tool}'s higher accuracy in API misuse detection than the
+state-of-the-art mining approaches.
+
+Data and code is available at~\cite{muinspect-website}.
