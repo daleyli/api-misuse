@@ -137,7 +137,7 @@
 %}
 %\makeatother
 
-\title{Title goes here}
+\title{Deep Learning Approach for API Misuse Detection}
 
 %\author{\IEEEauthorblockN{Aashish Yadavally and Tien N. Nguyen}
 %\IEEEauthorblockA{\textit{Computer Science Department} \\
@@ -155,7 +155,25 @@
 \maketitle
 
 \begin{abstract}
-Abstract goes here.
+API misuses are the incorrect usages that violate the usage
+constraints of the API elements. API misuses could cause several
+issues ranging from run-time errors and exceptions, program crashes,
+to security vulnerabilities. The state-of-the-art mining-based
+approaches suffer low accuracy because they cannot differentiate
+infrequent from invalid usage. This is an inherent issue with mining
+because these approaches need to set a pre-defined threshold for
+frequent API usage patterns. Another issue is that they mine a pattern
+and then report instances of alternative usages as violations.  In
+this work, we introduce a learning-based approach for API misuse
+detection that avoids the need of pre-defined thresholds. To overcome
+the lack of training data, we leverage two key data augmentation
+techniques to apply for AUG, a graph-based representation of API
+usages. We also leverage Labeled, Graph-based Convolutional Network to
+learn the embeddings for API usages, which capture the key features in
+API usages and be used for API misuse detection. Our empirical
+evaluation on real-world, API misuse benchmark shows that our model
+can relatively improve over the state-of-the-art API misuse detection
+from 30--35\%.
 \end{abstract}
 
 %\begin{IEEEkeywords}
