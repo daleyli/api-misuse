@@ -36,11 +36,16 @@
 \usepackage{amsthm}
 \usepackage{enumitem}
 
+\usepackage{tikz}
+\usetikzlibrary{shapes}
+
 \newtheorem{definition}{Definition}
 \newtheorem{key-idea}{Key Idea}
 \usepackage{balance}
 \usepackage{printlen}
 \usepackage[skins]{tcolorbox}
+
+
 
 %\usepackage{xcolor,pifont}
 %\newcommand*\colourcheck[1]{%
@@ -64,6 +69,9 @@
     colback=white,before upper=\strut},
   title=#2,#1
 }
+
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+    \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
 
 %\newcommand{\code}[1]{{\footnotesize\textsf{#1}}}
 

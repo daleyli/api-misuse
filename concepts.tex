@@ -39,8 +39,33 @@ a conditional structure with \code{if}, 6) a method call to
 \code{invalidate()}, and 6) a method call to
 \code{setAuthRequested(...)}.
 
+\begin{Definition}[API Misuse Classification~\cite{msr19}]
+There are two types of violation types in API misuses: missing and
+redundant elements. The following seven types of API-Usage elements are
+involved in an API misuse: method calls, \code{null} check condition,
+value/state conditions, synchronization conditions, contexts,
+iterations, and exception handling.
+\end{Definition}
+
+Missing method calls occurs if a method call is required but does
+not appear. Missing null checks occurs when a usage fails to ensure
+that a receiver or a parameter of a call is not null. Missing value or
+state conditions occur when a certain object contains certain key or
+value (e.g., \code{Map}). In multi-threaded environments, missing
+synchronization conditions may occur if a usage does not obtain a lock
+before updating. Missing context conditions may also occur, e.g., if a
+usage fails to ensure that GUI components in SWING are
+updated~\cite{msr19}. Missing iterations occurs if a usage does not
+repeatedly check a condition that the API usage constraints mandate
+must be checked again after executing part of the usage (e.g.,
+\code{wait}). Missing exception handling occurs if a usage does not
+take actions to recover from a possible error, as mandated by the API
+usage constraints. Similar misuses occur for the redundant
+elements. See details on the above API misuse types in~\cite{msr19}.
+
 To represent an API usage, we adopt a graph-based representation
-called {\em API-Usage Graphs (AUGs)}~\cite{msr19}.
+called {\em API-Usage Graphs (AUGs)}~\cite{msr19}. AUG is designed
+to capture the above types of API misuses.
 
 \begin{Definition}[API Usage Graph (AUG)~\cite{msr19}]
 AUG is a directed, connected graph with labelled nodes and
@@ -126,3 +151,5 @@ branching point to either branch.
 %connected subgraph with all data-dependent parts of a usage. The usage
 %relations are shown with their labels. {\em Order} edges are not
 %shown for clarity. The AUG building algorithm is explained in~\cite{msr19}.
+
+
