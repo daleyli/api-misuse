@@ -2,7 +2,7 @@
 \label{sec:concepts}
 
 This section describes the definitions of the important concepts
-regarding our representations on API usages.
+that are used in our solution.
 
 %\begin{figure}[t] %[!htp]
 %	\centering
@@ -31,30 +31,30 @@ elements (e.g., variables, parameters, etc.) in specific combinations
 and orders to perform a programming task.
 \end{Definition}
 
-In Fig.~\ref{fig:example1}, lines 2-5 show an API usage consisting of
-1) a variable \code{authstate}, 2) its declared class
+In Fig.~\ref{fig:example1}, lines 2--5 show an API usage consisting of
+1) the variable \code{authstate}, 2) its declared class
 \code{AuthState}, 3) a method call to \code{getHostAuthState()} on the
-variable \code{method}, 4) a method call to \code{isPreemptive()}, 5)
-a conditional structure with \code{if}, 6) a method call to
-\code{invalidate()}, and 6) a method call to
-\code{setAuthRequested(...)}.
+variable \code{method}, 4) a method call to \code{isPreemptive()} on
+\code{authstate}, 5) a conditional structure with
+\code{if}, 6) a method call to \code{invalidate()}, and 6) a method
+call to \code{setAuthRequested(...)}.
 
 \begin{Definition}[API Misuse Classification~\cite{msr19}]
-There are two types of violation types in API misuses: missing and
-redundant elements. The following seven types of API-Usage elements are
+There are two types of violations in API misuses: missing and
+redundant elements. The following types of API elements are
 involved in an API misuse: method calls, \code{null} check condition,
 value/state conditions, synchronization conditions, contexts,
 iterations, and exception handling.
 \end{Definition}
 
-Missing method calls occurs if a method call is required but does
-not appear. Missing null checks occurs when a usage fails to ensure
-that a receiver or a parameter of a call is not null. Missing value or
-state conditions occur when a certain object contains certain key or
+Missing method calls occurs if a method call is required but does not
+appear. Missing null checks occurs when a usage fails to ensure that a
+receiver or a parameter of a call is not null. Missing value or state
+conditions occur when a certain object needs to contain certain key or
 value (e.g., \code{Map}). In multi-threaded environments, missing
 synchronization conditions may occur if a usage does not obtain a lock
 before updating. Missing context conditions may also occur, e.g., if a
-usage fails to ensure that GUI components in SWING are
+usage fails to ensure that GUI components in Swing library are
 updated~\cite{msr19}. Missing iterations occurs if a usage does not
 repeatedly check a condition that the API usage constraints mandate
 must be checked again after executing part of the usage (e.g.,
@@ -68,7 +68,7 @@ called {\em API-Usage Graphs (AUGs)}~\cite{msr19}. AUG is designed
 to capture the above types of API misuses.
 
 \begin{Definition}[API Usage Graph (AUG)~\cite{msr19}]
-AUG is a directed, connected graph with labelled nodes and
+AUG is a directed, connected graph with labeled nodes and
 edges. Nodes represent data entities (variables, values), and actions,
 (method calls or operators). Edges represent the API usage
 relations among the entities and actions represented by nodes.
@@ -117,13 +117,12 @@ Fig.~\ref{fig:example1}.  The action nodes are displayed in the
 rectangles and the data nodes in the oval shapes. The action nodes
 represent method calls \code{Http\-Method\-.get\-Host\-Auth\-State},
 \code{Auth\-State\-.isPre\-emptive}, \code{Auth\-State.\-invalidate},
-\code{Auth\-State\-.set\-Auth\-Requested}. If the types are available,
+\code{Auth\-State\-.set\-Auth\-Requested}, etc. If the types are available,
 they will be resolved. However, in the figure, only the simple name is
 shown for clarity. The data nodes represent the variable \code{method}
 with the type \code{Http\-Method}, and the variable \code{authstate}
 with the type \code{Auth\-State}. The condition node \code{if}
-represents the \code{if} structure at line 3 of
-Fig.~\ref{fig:example1}.
+represents the \code{if} structure at line 3.
 
 There is a \code{recv} edge from \code{HttpMethod} to
 \code{get\-Host\-Auth\-State} (line 2) and another \code{recv} edge
@@ -136,10 +135,10 @@ because the former needs to be executed before the latter. Similar
 treatment is applied for \code{invalidate} and
 \code{set\-Auth\-Requested}. Because the \code{if} node represents the
 branching point in the condition structure, \code{isPre\-emptive} is
-executed before \code{if}. Finally, there are two \code{cond} edges
-from \code{if} to either \code{invalidate} and
-\code{set\-Auth\-Requested} due to the control flows from the
-branching point to either branch.
+executed before \code{if}, thus connected to \code{if}. Finally, there
+are two \code{cond} edges from \code{if} to either \code{invalidate}
+and \code{set\-Auth\-Requested} due to the control flows from the
+branching point to the two inside statements.
 
 %(\code{init}), method calls, field accesses, and operators. If the
 %types are available, they will be resolved. However, in the figure,
