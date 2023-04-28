@@ -6,8 +6,8 @@ via a sequence of the sub-tokens extracted from the node's
 content. The sub-token granularity for source code has been shown to
 have higher regularity than tokens~\cite{icse20-methodname}. Each name
 of an API element at a node is tokenized using CamelCase or Hungarian
-convention. Only variables, methods, fields, and class' names
-are kept. The sub-tokens with one character are removed to avoid
+convention. Only variables, methods, fields, and class' names are
+kept. The sub-tokens with one character are removed to avoid
 noises. We then treat each sequence of sub-tokens as a sentence and
 use a word embedding technique~\cite{glove2014} to build the vectors
 for the sub-tokens.  The vector for the sequence of sub-tokens is used

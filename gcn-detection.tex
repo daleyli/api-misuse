@@ -21,7 +21,7 @@ neighboring nodes. Another window (marked with \circled{B}) is for the
 node $N6$, including itself and the neighboring nodes. For each
 window, Label-GCN generates the feature representation matrix for the
 node at the center. For example, for the window centered at $N2$, it
-generates the feature vector $F_{N2}$, using the process explained in
+generates the feature vector $F_{N2}$, using the procedure explained in
 Section~\ref{sec:features}.
 
 From the representation vectors for all the nodes, Label-GCN uses a
@@ -46,13 +46,16 @@ contextualized embedding for the API usage in $m$.
 
 %labeling of each node in the training process: voice 1
 
-With the embedding for the API usage $V_m$, we perform classification
-by using two hidden layers (controlling the length of vectors and
-output) and a softmax function to produce a prediction score for
-$m$. We use those scores as {\em API misuse scores to rank the
-  methods} in a project. The decision for $m$ as $\mathcal{Y}$ or
-$\mathcal{N}$ for API misuse is done via a trainable threshold on the
-prediction score~\cite{li2018vuldeepecker,li2019improving}.
+With the embedding $V_m$ for the API usage in $m$, we perform
+classification by using two hidden layers (controlling the length of
+vectors and output) and a softmax function to produce a prediction
+result $\mathcal{Y}$ (misuse) or $\mathcal{N}$ (good use) for the API
+usage in $m$.
+
+%We use those scores as API misuse scores for the methods in a
+%project. The decision for $m$ as $\mathcal{Y}$ or $\mathcal{N}$ for
+%API misuse is done via a trainable threshold on the prediction
+%score~\cite{li2018vuldeepecker,li2019improving}.
 
 Our model also detects the API misuses at the API element level, i.e.,
 the node level in the AUG (Fig.~\ref{fig:gcn-detection}). During

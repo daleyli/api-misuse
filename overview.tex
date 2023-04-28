@@ -1,14 +1,9 @@
 \section{{\tool}: Model Architecture}
 \label{sec:overview}
 
-\begin{figure*}[t]
-\begin{center}
-\includegraphics[width=5.6in]{overview.png}
-\vspace{-5pt}
-\caption{{\tool}: Architecture Overview}
-\label{fig:overview}
-\end{center}
-\end{figure*}
+
+
+\subsection{Overview}
 
 In general, in addition to data augmentation component, {\tool} has
 three other key components (Fig.~\ref{fig:overview}). The first component is
@@ -38,7 +33,7 @@ the outputs of the Label-GCN to a fully connected layer. Instead, we
 use the output nodes of the Label-GCN model to represent the decisions
 of misuses or not for the corresponding API elements. In this case,
 for training, we use as labels the misused API elements in each method
-in training data. Then, for each output node of the Label-GCN model,
+in training data. For prediction, for each output node of Label-GCN,
 we use a softmax function to classify the node (i.e., the API element)
 as misuse or not. For clarity, we do not show this case in
 Fig.~\ref{fig:overview}.

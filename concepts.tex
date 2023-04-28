@@ -4,13 +4,7 @@
 This section describes the definitions of the important concepts
 that are used in our solution.
 
-%\begin{figure}[t] %[!htp]
-%	\centering
-%	\includegraphics[width=0.9\linewidth]{aug-example}
-%        \vspace{-3pt}
-%	\caption{An API Usage and its API-Usage Graph}
-%	\label{fig:aug}
-%\end{figure}
+
 
 \begin{Definition}[API elements]
 An API element is either a class, a method, or a field that is
@@ -39,6 +33,14 @@ variable \code{method}, 4) a method call to \code{isPreemptive()} on
 \code{if}, 6) a method call to \code{invalidate()}, and 6) a method
 call to \code{setAuthRequested(...)}.
 
+\begin{figure}[t] %[!htp]
+	\centering
+	\includegraphics[width=1.8in]{aug}
+        \vspace{-3pt}
+	\caption{API-Usage Graph for Fig.~\ref{fig:example1}}
+	\label{fig:aug}
+\end{figure}
+
 \begin{Definition}[API Misuse Classification~\cite{msr19}]
 There are two types of violations in API misuses: missing and
 redundant elements. The following types of API elements are
@@ -46,6 +48,15 @@ involved in an API misuse: method calls, \code{null} check condition,
 value/state conditions, synchronization conditions, contexts,
 iterations, and exception handling.
 \end{Definition}
+
+\begin{figure*}[t]
+\begin{center}
+\includegraphics[width=5.4in]{overview.png}
+\vspace{-5pt}
+\caption{{\tool}: Architecture Overview}
+\label{fig:overview}
+\end{center}
+\end{figure*}
 
 Missing method calls occurs if a method call is required but does not
 appear. Missing null checks occurs when a usage fails to ensure that a
@@ -104,13 +115,7 @@ an action in a respective exception handling block.
 We expect to leverage API usage relations among API elements
 and relevant program entities for misuse detection.
 
-\begin{figure}[t] %[!htp]
-	\centering
-	\includegraphics[width=1.8in]{aug}
-        \vspace{-3pt}
-	\caption{API-Usage Graph for Fig.~\ref{fig:example1}}
-	\label{fig:aug}
-\end{figure}
+
 
 Fig.~\ref{fig:aug} shows the AUG of the code in
 Fig.~\ref{fig:example1}.  The action nodes are displayed in the
@@ -123,6 +128,8 @@ shown for clarity. The data nodes represent the variable \code{method}
 with the type \code{Http\-Method}, and the variable \code{authstate}
 with the type \code{Auth\-State}. The condition node \code{if}
 represents the \code{if} structure at line 3.
+
+
 
 There is a \code{recv} edge from \code{HttpMethod} to
 \code{get\-Host\-Auth\-State} (line 2) and another \code{recv} edge
