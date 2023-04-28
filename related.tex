@@ -13,5 +13,52 @@ another misuse detector for C~\cite{L07}, which improves PRMiner using
 Formal Concept Analysis~\cite{GW99}. Chronicler is a misuse detector
 for C~\cite{RGJ07b}, that mines frequent call-precedence relations
 from an inter-procedural control-flow graph, and detects missing
-method calls.
+method calls. Jadet is a misuse detector for Java~\cite{WZL07}. It
+encodes method-call order and call receivers in usages. It builds a
+directed graph whose nodes represent method calls on a given object
+and whose edges represent control flows. From this graph, it derives a
+pair of calls for each call-order relationship. The sets of these
+pairs form the input to the mining, which identifies patterns. A
+violation may miss at most two properties of the violated pattern and
+needs to occur at least ten times less frequently than the pattern.
+Jadet detects missing method calls. It may detect missing loops as a
+missing call-order relation from a method call in the loop header to
+itself.
 
+RGJ07 is a misuse detector for C~\cite{RGJ07}.  It encodes usages as
+sets of properties for each variable.  Properties are comparisons to
+literals, argument positions in function calls, and assignments.
+%For each call, it creates a group of the property sets of the call's arguments.
+%To all groups for a particular function, it applies sequence mining to learn common sequences of control-flow properties and frequent-itemset mining to identify all common sets of all other property types.
+% Detection
+%Subsequently,
+%
+It identifies violations of the common~property sequences and sets.
+% Capabilities
+%\RGJ is designed to detect missing conditions.
+From the properties it encodes, it can detect missing \code{null} checks and missing value or state conditions.
+%Since patterns contain preceding calls on arguments, it may also detect missing calls, if the respective call shares an argument with another call in the pattern.
+% Performance
+%The evaluation by the authors of \RGJ applied the detector to a single
+%project, thereby finding violations of project-specific patterns.  The
+%authors discussed several examples of actual bugs their approach
+%detects, but reported no statistics on the detection performance.
+
+Alattin is a misuse detector for Java~\cite{TX09b}, specialized in
+alternative patterns for condition checks.  For each target method
+\code{m}, it queries the code-search engine Google Code Search
+to find example usages.  From each example, it extracts a set of rules
+about pre- and post-condition checks on the receiver, the arguments,
+and the return value of \code{m}, e.g., ``\code{boolean} check on
+\code{return} of \code{Iterator.hasNext} before
+\code{Iterator.next}.''
+% or ``\code{null} check on \code{argument} of \code{ArrayList.constructor} after \code{Iterator.next}.'' 
+It then applies frequent-itemset mining on these rules to obtain patterns with a minimum support of $40\%$.
+For each such pattern, it extracts the subset of all groups that do not adhere to the pattern and repeats mining on that subset to obtain infrequent patterns with a minimum support of $20\%$.
+Finally, it combines all frequent and infrequent patterns for the same method by disjunction.
+% Detection
+An analyzed method has a violation if the set of rules that hold in it is not a superset of any of the alternative patterns.
+Violations are ranked by the support of the respective pattern.
+% Capabilities
+Alattin, therefore, detects missing \code{null}-checks and missing value or state conditions that are ensured by checks and that do not involve literals.
+It may also detect missing method-calls that occur in checks.
