@@ -1,4 +1,17 @@
 \section{Related Work}
 \label{sec: related}
 
+{\tool} is related to the line of work on API misuse detection.
+The most prominent direction is mining API usage patterns
+and leverage them to detect API misuses.
+
+PRMiner is a misuse detector for C~\cite{LZ05}, which encodes usages
+as the set of all function calls. It employs frequent-itemset mining
+to find patterns. Violations here are strict subsets of a pattern that
+occur at least ten times less frequently than the pattern. Colibri is
+another misuse detector for C~\cite{L07}, which improves PRMiner using
+Formal Concept Analysis~\cite{GW99}. Chronicler is a misuse detector
+for C~\cite{RGJ07b}, that mines frequent call-precedence relations
+from an inter-procedural control-flow graph, and detects missing
+method calls.
 
