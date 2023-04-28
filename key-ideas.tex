@@ -13,9 +13,9 @@ less regular ones. Importantly, the learning-based direction helps
 avoid the use of thresholds in either establishing the API usage
 patterns or distinguishing between the misuses and the uncommon
 usages, which is the key limitation of the mining-based API misuse
-detection approaches. We ultilize the complete, compilable code
-using the libraries from a large code corpus, in which all the API
-elements in use are known.
+detection approaches. We utilize as the training dataset the
+complete, compilable code using the libraries from a large code
+corpus, in which all the API elements in use are known.
 \end{key-idea}
 
 
@@ -24,10 +24,10 @@ A key challenge in using a learning-based approach for API misuse
 detection is the lack of training data. Because the number of the
 samples of API misuses is much smaller in comparison with the the
 number of correct API usages, one would face the issue of highly
-unbalanced data. To enable our deep-learning-based solution, we have
-utilized a few technique for data augmentation to increase the numbers
-of API misuses for model training
-(Section~\ref{sec:data-aug}).
+unbalanced data as well as insufficient data. To enable our
+deep-learning-based solution, we have utilized techniques for
+data augmentation to increase the numbers of API misuses for model
+training (Section~\ref{sec:data-aug}).
 \end{key-idea}
 
 %artificially increases the training set by creating modified copies of
@@ -38,7 +38,7 @@ Representation Learning] We leverage a graph-based, representation
   learning model to {\em learn the contextualized embeddings for API
     Usages} that integrates {\em data and control dependencies}, and
   control structures among API and program elements. We train a
-  Labelled Graph-based Convolution Network~\cite{label-gcn} to learn
+  Labeled Graph-based Convolutional Network~\cite{label-gcn} to learn
   the embeddings for API usages from a graph-based API usage
   representation, called API Usage Graph (AUG)~\cite{msr19}. The
   embeddings will capture the key features in API usages and be used
