@@ -11,7 +11,7 @@
 \end{figure*}
 
 In general, in addition to data augmentation component, {\tool} has
-two main components (Fig.~\ref{fig:overview}). The first component is
+three other key components (Fig.~\ref{fig:overview}). The first component is
 to generate the usage graphs (AUGs) for all the methods. We use the
 AUG building algorithm described in the original
 paper~\cite{msr19}. The second component is to generate the feature
@@ -25,8 +25,10 @@ nodes in the AUG, the Label-GCN model will produce the outputs at the
 output layer. The Label-GCN model connects all of its outputs to a
 fully connected layer to transform the matrix into a vector $V$ for
 the given API usage. This vector $V$ is the contextualized embedding
-representing the given API usage. Our model then performs
-classification by using a softmax function on $V$ to decide if it
+representing the given API usage.
+
+Our model then performs classification by using a softmax function on
+the contextualized embedding $V$ for the given usage to decide if it
 contains an API misuse. In training, we use the labels of the API
 misuses and benign usages.
 
