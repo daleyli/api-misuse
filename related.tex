@@ -5,25 +5,27 @@
 The most prominent direction is mining API usage patterns
 and leverage them to detect API misuses.
 
-PRMiner is a misuse detector for C~\cite{LZ05}, which encodes usages
-as the set of all function calls. It employs frequent-itemset mining
-to find patterns. Violations here are strict subsets of a pattern that
-occur at least ten times less frequently than the pattern. Colibri is
-another misuse detector for C~\cite{L07}, which improves PRMiner using
-Formal Concept Analysis~\cite{GW99}. Chronicler is a misuse detector
-for C~\cite{RGJ07b}, that mines frequent call-precedence relations
-from an inter-procedural control-flow graph, and detects missing
-method calls. Jadet is a misuse detector for Java~\cite{WZL07}. It
-encodes method-call order and call receivers in usages. It builds a
-directed graph whose nodes represent method calls on a given object
-and whose edges represent control flows. From this graph, it derives a
-pair of calls for each call-order relationship. The sets of these
-pairs form the input to the mining, which identifies patterns. A
-violation may miss at most two properties of the violated pattern and
-needs to occur at least ten times less frequently than the pattern.
-Jadet detects missing method calls. It may detect missing loops as a
-missing call-order relation from a method call in the loop header to
-itself.
+PRMiner is a misuse detector for C~\cite{LZ05}. It encodes usages as
+the set of function calls and employs frequent-itemset mining to find
+patterns. Violations are strict subsets of a pattern that occur at
+least ten times less frequently than the pattern. Colibri is also for
+C~\cite{L07}, which improves PRMiner using Formal Concept
+Analysis~\cite{GW99}. Chronicler is a misuse detector
+for~C~\cite{RGJ07b}, that mines frequent call-precedence relations
+from a control-flow graph, and detects missing
+method calls. Jadet, a detector for Java~\cite{WZL07},
+%It encodes method-call order and call receivers in usages.
+%It builds a directed graph whose nodes represent method calls on a
+%given object and whose edges represent control flows. From this graph,
+%
+derives a pair of calls for each call-order relationship. The
+sets of these pairs form the input to the mining, which identifies
+patterns. A violation may miss at most two properties of the violated
+pattern and needs to occur at least ten times less frequently than the
+pattern.
+%Jadet detects missing method calls. It may detect missing loops as a
+%missing call-order relation from a method call in the loop header to
+%itself.
 
 RGJ07 is a misuse detector for C~\cite{RGJ07}.  It encodes usages as
 sets of properties for each variable.  Properties are comparisons to
@@ -45,20 +47,87 @@ From the properties it encodes, it can detect missing \code{null} checks and mis
 %detects, but reported no statistics on the detection performance.
 
 Alattin is a misuse detector for Java~\cite{TX09b}, specialized in
-alternative patterns for condition checks.  For each target method
-\code{m}, it queries the code-search engine Google Code Search
-to find example usages.  From each example, it extracts a set of rules
-about pre- and post-condition checks on the receiver, the arguments,
-and the return value of \code{m}, e.g., ``\code{boolean} check on
-\code{return} of \code{Iterator.hasNext} before
-\code{Iterator.next}.''
-% or ``\code{null} check on \code{argument} of \code{ArrayList.constructor} after \code{Iterator.next}.'' 
-It then applies frequent-itemset mining on these rules to obtain patterns with a minimum support of $40\%$.
-For each such pattern, it extracts the subset of all groups that do not adhere to the pattern and repeats mining on that subset to obtain infrequent patterns with a minimum support of $20\%$.
-Finally, it combines all frequent and infrequent patterns for the same method by disjunction.
+alternative patterns for condition checks.
+%For each target method \code{m}, it queries the code-search engine
+%Google Code Search to find example usages.  From each example, it
+%extracts a set of rules about pre- and post-condition checks on the
+%receiver, the arguments, and the return value of \code{m}, e.g.,
+%``\code{boolean} check on \code{return} of \code{Iterator.hasNext}
+%before \code{Iterator.next}.''
+It applies frequent-itemset mining on pre-/post-condition
+rules to obtain patterns.
+%with a minimum support of $40\%$.
+For a pattern, it extracts the subset of all groups that do
+not adhere to the pattern and repeats mining on that subset to obtain
+infrequent patterns.
+%with a minimum support of $20\%$.
+%Finally, it combines all frequent and infrequent patterns for the same
+%method by disjunction.
 % Detection
-An analyzed method has a violation if the set of rules that hold in it is not a superset of any of the alternative patterns.
-Violations are ranked by the support of the respective pattern.
+A method has a violation if the set of rules that hold 
+is not a superset of any of the alternative (combined) patterns.
+%Violations are ranked by the support of the respective pattern.
 % Capabilities
-Alattin, therefore, detects missing \code{null}-checks and missing value or state conditions that are ensured by checks and that do not involve literals.
-It may also detect missing method-calls that occur in checks.
+%Alattin, therefore, detects missing \code{null}-checks and missing value or state conditions that are ensured by checks and that do not involve literals.
+%It may also detect missing method-calls that occur in checks.
+%
+AX09 is a misuse detector for C~\cite{AX09}, specialized in detecting
+wrong error handling, realized through returning (and checking for)
+error codes.
+%It distinguishes normal paths, i.e., execution paths
+%from the beginning of the \code{main} function to its end, and error
+%paths, i.e., paths from the beginning of the \code{main} function to
+%an \code{exit} or \code{return} statement in an error-handling block.
+It uses push-down model checking to generate such paths as sequences
+of method calls and applies frequent-subsequence mining to find
+patterns.
+%
+CAR-Miner is a misuse detector for C++ and Java~\cite{TX09},
+specialized in detecting wrong error handling.
+%For each analyzed method \code{m} in a given code corpus, it queries
+%the code-search engine \aName{Google Code Search} to find example
+%usages.  From the examples, it builds an \emph{Exception Flow Graph}
+%(EFG), i.e., a control-flow graph with additional edges for
+%exceptional flow.
+From Exception Flow Graph of a method, it
+generates \emph{normal} call sequences that lead to the currently
+analyzed call and \emph{exception} call sequences that lead from the
+call along exceptional edges.  Subsequently, it mines association
+rules between normal sequences and exception sequences.
+% and ranks these rules by their support.
+% Detection
+To detect violations,
+%it extracts the normal call sequence and
+%the exception call sequence for the target method call. It then
+it uses the learned association rules to determine the expected
+exception handling and reports a violation if the actual sequence in
+the target method does not include it.
+
+GROUMiner is a misuse detector for Java~\cite{NNP+09}.  It creates a
+graph-based object-usage representation for each target method.
+%rules between
+%normal sequences and exception sequences.
+It then performs frequent-subgraph mining on sets of such graphs to
+detect patterns.  When at least 90\% of all occurrences of a
+sub-pattern can be extended to a larger pattern, but some cannot,
+those \emph{rare} inextensible occurrences are considered as
+violations. DMMC is a misuse detector for Java~\cite{MBM10},
+specialized in missing method calls.  The detection is based on type
+usages, i.e., sets of methods called on a given receiver type in a
+given method.
+%DMMC detects misuses with exactly one missing method-call.
+Tikanga is a misuse detector for Java~\cite{WZ11} that builds on
+Jadet.  It extends the simple call-order properties to general
+Computation Tree Logic formulae on object usages. DroidAssist is a
+detector for Dalvik Bytecode (Android Java)~\cite{NPVN16}.  It
+generates method-call sequences from source code and learns a Hidden
+Markov Model from them, to compute the likelihood of a particular call
+sequence. If the likelihood is too small, the sequence is considered a
+violation. MUDetect~\cite{msr19} is a misuse detector for Java that is
+extended from GROUMiner with a new graph representation.
+
+In brief, there are two key issues with existing mining-based API
+misuse detectors. First, they cannot differentiate infrequent from
+invalid usage because they require to set a pre-defined threshold for
+frequent API usage patterns. Second, they often learn a pattern and
+then report instances of alternative usages as violations.
