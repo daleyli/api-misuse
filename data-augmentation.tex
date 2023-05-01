@@ -1,4 +1,29 @@
 \section{Data Augmentation for API usages}
 \label{sec:data-aug}
 
+Because of the API misuse dataset size limitation, data augmentation is needed before applying the deep learning model to the API misuse detection problem. This section describes the techniques we used for the data augmentation.
 
+\subsection{Noisy Student Self-training}
+
+From the state-of-the-art study ~\cite{msr19}, the API misuse dataset only contains $171$ API misuse data which is too small for any deep learning to learn useful information. To begin with, we tried the well-known self-training data augmentation framework Noisy Student from Google~\cite {xie2020self} first. This framework contains four main steps:
+
+\begin{itemize}
+	\item Step 1: Train a teacher model $M_t$ on the existing API misuse dataset $D_o$ with the minimized cross entropy loss.
+	\item Step 2: Use trained teacher model $M_t$ to generate pseudo labels for unlabeled data $D_p$.
+	\item Step 3: Train a student model $M_s$ which minimize the cross entropy loss on combined dataset $D_c = D_o + D_p$ with {\bf{noise}} added to the student model $M_s$
+	\item Step 4: Regard student model $M_s$ as new teacher model $M_t$ and go back to Step 2 and repeat until we get enough data. 
+\end{itemize}
+
+The {\bf{noise}} here contains two main parts, including input noise which contains data augmentation, and model noise which contains dropout and stochastic depth. For input noise, the original paper~\cite{xie2020self} uses RandAugment~\cite{cubuk2020randaugment}, which is designed for images. To make it work for our problem, we replaced $14$ image augmentation techniques in RandAugment with the techniques that were used before training from a graph data augmentation library~\cite{grafog}. For model noise, we keep the same techniques in the original paper. For more details about the Noisy Student Self-learning Framework, please refer to the original paper~\cite{xie2020self}.
+
+By applying the Noisy Student Self-training framework on the unlabeled dataset containing 53k+ methods, we only got 1.1K+ methods that may contain API misuse, which is still insufficient for deep learning models. Also, because the ratio between methods containing API misuse and methods not containing API misuse is too small, the correct rate of data augmentation is suspicious.
+
+\subsection{Data Mutation}
+
+To overcome this specific challenge in our problem, we would like to bring out a new solution for data augmentation. From the experiences in existing studies on fault localization research area, we try to apply the mutation techniques in our data augmentation problem. In this paper, we use the powerful mutation package PIT~\cite{PIT} as the tool for generating mutated data.
+
+To apply the mutators in our problem, there are a few points we need to avoid. First of all, we would like to generate the mutated data with API misuse from the existing API misuse data, so in this case, we need to make sure the misused API call should not be influenced during the mutation. To achieve this, we only apply the mutators on the API calls that do not directly relate to the misused API calls. This reflects on AUG that we only pick the nodes with no data or control dependency (Except running order) connections linked with the misused API calls. Here the connections contain not only the directly linked edges but also a connection across multiple nodes. For example, in Figure~\ref{fig:aug}, if the misused API is $AuthState.isPreemptive$, we still consider the node $AuthState.setAuthRequested$ has a connection with $AuthState.isPreemptive$ because there is a control dependency edge between node $If$ and node $AuthState.isPreemptive$ and there is a data dependency edge between node $If$ and node $AuthState.setAuthRequested$.
+
+Secondly, because we use AUG in our model design, we only apply the mutators that can influence the AUG structure to the data augmentation. In this case, we can avoid the case that after applying the mutator, the AUGs before mutation and after mutation are the same. We manually selected the mutators, including Void Method Call Mutator, Empty returns Mutator, False returns Mutator, True returns Mutator, Null returns Mutator, Primitive returns Mutator, Constructor Call Mutator, and Non-Void Method Call Mutator. For detailed information about these mutators, please check the PIT website~\cite{PIT}.
+
+We can finally get 5k+ mutated API misuse data from $171$ existing data by applying the mutation techniques to our API misuse data. 
